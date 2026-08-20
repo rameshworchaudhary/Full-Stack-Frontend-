@@ -1,0 +1,6 @@
+{
+  "name": "Student Dashboard",
+  "description": "A clean, modern student portal connected to the Spring Boot REST API for managing study schedules and announcements.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

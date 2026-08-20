@@ -1,21 +1,40 @@
-const API_BASE_URL = "https://full-stack-0yf4.onrender.com";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://full-stack-0yf4.onrender.com";
 
 async function request(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      ...options,
+    });
 
-  const data = await response.json();
+    let data;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { message: text };
+    }
 
-  if (!response.ok) {
-    throw new Error(data.message || "Something went wrong");
+    if (!response.ok) {
+      const errorMsg =
+        data?.message ||
+        data?.error ||
+        `Request failed with status ${response.status}`;
+      throw new Error(errorMsg);
+    }
+
+    return data;
+  } catch (err) {
+    if (err.name === "TypeError" && err.message.includes("fetch")) {
+      throw new Error("Unable to connect to the backend server. Please check your internet connection.");
+    }
+    throw err;
   }
-
-  return data;
 }
 
 export const authApi = {
